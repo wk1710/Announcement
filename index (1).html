@@ -913,7 +913,7 @@
         let diffStr = `${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
         if (diffMinutes > 0) diffStr += ` and ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
         const relation = diff > 0 ? 'ahead of' : 'behind';
-        timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, The current local time now is ${conversationalCurrentLocalTime} and barring any air traffic control delays, and we expect to land at approximately ${conversationalLocalTime}`;
+        timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, The current local time now is ${conversationalCurrentLocalTime} and barring any air traffic control delays, We expect to land at approximately ${conversationalLocalTime}`;
       }
       
       const weatherPhrase = weatherPresentation[selectedWeatherPhenomenon] || `is ${selectedWeatherPhenomenon}`;
