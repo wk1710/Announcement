@@ -871,6 +871,8 @@
       const todMinutes = document.getElementById('todMinutes').value;
       const arrivalZuluHH = parseInt(document.getElementById('arrivalTimeZuluHH').value);
       const arrivalZuluMM = parseInt(document.getElementById('arrivalTimeZuluMM').value);
+      const currentZuluHH = parseInt(document.getElementById('currentTimeZuluHH').value);
+      const currentZuluMM = parseInt(document.getElementById('currentTimeZuluMM').value);
       const selectedWeatherPhenomenon = document.getElementById('weatherPhenomena').value;
       const temperature = document.getElementById('temperature').value;
       const taxiTimeValue = document.getElementById('taxiTime').value;
@@ -878,6 +880,7 @@
       if (!originCode || !arrivalCode) { alert("Please select both origin and arrival airports."); return; }
       if (originCode === arrivalCode) { alert("Origin and Arrival airports cannot be the same."); return; } 
       if (isNaN(arrivalZuluHH) || isNaN(arrivalZuluMM) || arrivalZuluHH < 0 || arrivalZuluHH > 23 || arrivalZuluMM < 0 || arrivalZuluMM > 59) { alert("Please enter a valid Zulu arrival time (HH:MM)."); return; }
+      if (isNaN(currentZuluHH) || isNaN(currentZuluMM) || currentZuluHH < 0 || currentZuluHH > 23 || currentZuluMM < 0 || currentZuluMM > 59) { alert("Please enter a valid Zulu arrival time (HH:MM)."); return; }
       if (isNaN(parseInt(temperature))) { alert("Please enter a valid temperature."); return; }
 
       const originAirportDetails = airportData[originCode];
@@ -888,6 +891,8 @@
       if (effectiveArrivalGmt === null) { alert("Could not determine effective GMT offset for arrival airport."); return; }
 
       const localArrivalTime = calculateLocalTime(arrivalZuluHH, arrivalZuluMM, effectiveArrivalGmt);
+      const currentLocalTime = calculateLocalTime(currentZuluHH, currentZuluMM, effectiveArrivalGmt);
+      const conversationalCurrentLocalTime = formatLocalTimeConversational(currentLocalTime.hours, currentLocalTime.minutes);
       const conversationalLocalTime = formatLocalTimeConversational(localArrivalTime.hours, localArrivalTime.minutes);
       
       const displayArrivalFullName = arrivalAirportDetails.announcementName || arrivalAirportDetails.name;
@@ -898,7 +903,7 @@
       const originGmt = originAirportDetails.standardGmtOffset;
 
       if (originGmt === effectiveArrivalGmt) {
-        timeAndLandingStatement = `There is no time difference between ${displayOriginShortName} and ${displayArrivalShortName}. We expect to land at approximately ${conversationalLocalTime}`;
+        timeAndLandingStatement = `There is no time difference between ${displayOriginShortName} and ${displayArrivalShortName}. The current local time now is ${conversationalCurrentLocalTime} and barring any air traffic control delays, We expect to land at approximately ${conversationalLocalTime}`;
       } else {
         const diff = effectiveArrivalGmt - originGmt;
         const totalAbsDiffInMinutes = Math.round(Math.abs(diff * 60));
@@ -908,7 +913,7 @@
         let diffStr = `${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
         if (diffMinutes > 0) diffStr += ` and ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
         const relation = diff > 0 ? 'ahead of' : 'behind';
-        timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, and we expect to land at approximately ${conversationalLocalTime}`;
+        timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, The current local time now is ${conversationalCurrentLocalTime} and barring any air traffic control delays, and we expect to land at approximately ${conversationalLocalTime}`;
       }
       
       const weatherPhrase = weatherPresentation[selectedWeatherPhenomenon] || `is ${selectedWeatherPhenomenon}`;
