@@ -476,6 +476,18 @@
 
       <div class="form-row">
           <div class="form-group">
+            <label for="currentTimeZuluHH"> Current Local Time (Zulu)</label>
+            <div class="time-input-group">
+              <input type="number" id="currentTimeZuluHH" placeholder="HH" min="0" max="23">
+              <span>:</span>
+              <input type="number" id="currentTimeZuluMM" placeholder="MM" min="0" max="59">
+              <span>Z</span>
+            </div>
+          </div>
+      </div>      
+
+      <div class="form-row">
+          <div class="form-group">
             <label for="weatherPhenomena">Weather at Destination</label>
             <select id="weatherPhenomena"></select>
           </div>
@@ -903,10 +915,10 @@
       const weatherFull = `${weatherPhrase} with a temperature of ${temperature} degrees Celsius`;
       
       const useConversationalTone = document.getElementById('conversationalToneCheck').checked;
-      const speakerIdentifier = speakerRole === "Pilot" ? "your pilot speaking" : `your ${speakerRole}`; 
+      const speakerIdentifier = speakerRole === "Pilot" ? "your pilot Wilson speaking" : `your ${speakerRole}`; 
       const greeting = useConversationalTone ? "Ladies and Gentlemen, boys and girls," : "Ladies and Gentlemen,";
 
-      const announcement = `${greeting} this is ${speakerIdentifier}. We will be commencing our descent into ${displayArrivalFullName} in about ${todMinutes} minutes time.
+      const announcement = `${greeting} this is ${speakerIdentifier}. We will be commencing our descent into ${displayArrivalFullName} shortly. 
 Current Weather at ${displayArrivalShortName} ${weatherFull}.
 ${timeAndLandingStatement}, and another ${taxiTimeValue} minutes thereafter to the gate.
 On behalf of the crew, we would like to thank you once again for flying with ${airlineName}. Cabin crew, please prepare for arrival.`; 
