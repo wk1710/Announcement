@@ -903,7 +903,7 @@
       const originGmt = originAirportDetails.standardGmtOffset;
 
       if (originGmt === effectiveArrivalGmt) {
-        timeAndLandingStatement = `There is no time difference between ${displayOriginShortName} and ${displayArrivalShortName}. The current local time is ${conversationalCurrentLocalTime} and barring any air traffic control delays, We expect to land at approximately ${conversationalLocalTime}`;
+        timeAndLandingStatement = `There is no time difference between ${displayOriginShortName} and ${displayArrivalShortName}. The current time is ${conversationalCurrentLocalTime} and barring any air traffic control delays, We expect to land at approximately ${conversationalLocalTime}`;
       } else {
         const diff = effectiveArrivalGmt - originGmt;
         const totalAbsDiffInMinutes = Math.round(Math.abs(diff * 60));
@@ -913,18 +913,20 @@
         let diffStr = `${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
         if (diffMinutes > 0) diffStr += ` and ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
         const relation = diff > 0 ? 'ahead of' : 'behind';
-        timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, The current local time is ${conversationalCurrentLocalTime} and barring any air traffic control delays, We expect to land at approximately ${conversationalLocalTime}`;
+        timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, The current time is ${conversationalCurrentLocalTime} and barring any air traffic control delays, We expect to land at approximately ${conversationalLocalTime}`;
       }
       
-      const weatherPhrase = weatherPresentation[selectedWeatherPhenomenon] || `is ${selectedWeatherPhenomenon}`;
+      const weatherPhrase = weatherPresentation[selectedWeatherPhenomenon] || `is reported to have ${selectedWeatherPhenomenon}`;
       const weatherFull = `${weatherPhrase} with a temperature of ${temperature} degrees Celsius`;
       
       const useConversationalTone = document.getElementById('conversationalToneCheck').checked;
       const speakerIdentifier = speakerRole === "Pilot" ? "your pilot Wilson speaking" : `your ${speakerRole}`; 
       const greeting = useConversationalTone ? "Ladies and Gentlemen, boys and girls," : "Ladies and Gentlemen,";
 
-      const announcement = `${greeting} this is ${speakerIdentifier}. We will be commencing our descent into ${displayArrivalFullName} shortly in a approximately ${todMinutes}.
+      const announcement = `${greeting} this is ${speakerIdentifier}. We will be commencing our descent into ${displayArrivalFullName} shortly in a approximately ${todMinutes} minutes.
+      
 ${timeAndLandingStatement}, and another ${taxiTimeValue} minutes thereafter to the gate.
+
 Current Weather in ${displayArrivalShortName} ${weatherFull}.
 I trust that you have enjoyed your stay with us today, and it has been a pleasure having you onboard. On behalf of Captain ________ and the rest of the crew, we would like to thank you once again for choosing to flying with ${airlineName}. 
 Cabin crew, please prepare for arrival.`; 
