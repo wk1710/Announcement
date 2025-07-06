@@ -622,44 +622,44 @@
     ];
     
     const weatherPresentation = {
-        "Partly Cloudy": "is partly cloudy",
-        "Clear Sky": "has clear skies",
-        "Few Clouds": "has a few clouds",
-        "Scattered Clouds": "has scattered clouds",
-        "Broken Clouds": "has broken clouds",
-        "Overcast": "is overcast",
-        "Mist": "is misty",
-        "Fog": "is foggy",
-        "Shallow Fog": "has shallow fog",
-        "Patches of Fog": "has patches of fog",
-        "Haze": "is hazy",
-        "Smoke": "is smoky",
-        "Light Drizzle": "has light drizzle",
-        "Drizzle": "has drizzle",
-        "Heavy Drizzle": "has heavy drizzle",
-        "Light Rain": "has light rain",
-        "Rain": "has rain",
-        "Heavy Rain": "has heavy rain",
-        "Light Showers": "has light showers",
-        "Showers": "has showers",
-        "Heavy Showers": "has heavy showers",
-        "Thunderstorm without Precipitation": "has thunderstorm activity nearby",
-        "Thunderstorm with Light Rain": "has thunderstorms with light rain",
-        "Thunderstorm with Rain": "has thunderstorms and rain",
-        "Thunderstorm with Heavy Rain": "has thunderstorms with heavy rain",
-        "Light Snow": "has light snow",
-        "Snow": "has snow",
-        "Heavy Snow": "has heavy snow",
-        "Light Snow Showers": "has light snow showers",
-        "Snow Showers": "has snow showers",
-        "Heavy Snow Showers": "has heavy snow showers",
-        "Freezing Drizzle": "has freezing drizzle",
-        "Freezing Rain": "has freezing rain",
-        "Blowing Snow": "has blowing snow",
-        "Sandstorm": "is experiencing a sandstorm",
-        "Duststorm": "is experiencing a duststorm",
-        "Squalls": "is experiencing squalls",
-        "Volcanic Ash": "has reports of volcanic ash"
+        "Partly Cloudy": "be partly cloudy",
+        "Clear Sky": "have clear skies",
+        "Few Clouds": "have a few clouds",
+        "Scattered Clouds": "have scattered clouds",
+        "Broken Clouds": "have broken clouds",
+        "Overcast": "be overcast",
+        "Mist": "be misty",
+        "Fog": "be foggy",
+        "Shallow Fog": "have shallow fog",
+        "Patches of Fog": "have patches of fog",
+        "Haze": "be hazy",
+        "Smoke": "be smoky",
+        "Light Drizzle": "have light drizzle",
+        "Drizzle": "have drizzle",
+        "Heavy Drizzle": "have heavy drizzle",
+        "Light Rain": "have light rain",
+        "Rain": "have rain",
+        "Heavy Rain": "have heavy rain",
+        "Light Showers": "have light showers",
+        "Showers": "have showers",
+        "Heavy Showers": "have heavy showers",
+        "Thunderstorm without Precipitation": "have thunderstorm activity nearby",
+        "Thunderstorm with Light Rain": "have thunderstorms with light rain",
+        "Thunderstorm with Rain": "have thunderstorms and rain",
+        "Thunderstorm with Heavy Rain": "have thunderstorms with heavy rain",
+        "Light Snow": "have light snow",
+        "Snow": "have snow",
+        "Heavy Snow": "have heavy snow",
+        "Light Snow Showers": "have light snow showers",
+        "Snow Showers": "have snow showers",
+        "Heavy Snow Showers": "have heavy snow showers",
+        "Freezing Drizzle": "have freezing drizzle",
+        "Freezing Rain": "have freezing rain",
+        "Blowing Snow": "have blowing snow",
+        "Sandstorm": "be experiencing a sandstorm",
+        "Duststorm": "be experiencing a duststorm",
+        "Squalls": "be experiencing squalls",
+        "Volcanic Ash": "have reports of volcanic ash"
     };
 
 
@@ -916,7 +916,7 @@
         timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, The current time is ${conversationalCurrentLocalTime} and barring any air traffic control delays, We expect to land at approximately ${conversationalLocalTime}`;
       }
       
-      const weatherPhrase = weatherPresentation[selectedWeatherPhenomenon] || `is reported to have ${selectedWeatherPhenomenon}`;
+      const weatherPhrase = weatherPresentation[selectedWeatherPhenomenon] || `is ${selectedWeatherPhenomenon}`;
       const weatherFull = `${weatherPhrase} with a temperature of ${temperature} degrees Celsius`;
       
       const useConversationalTone = document.getElementById('conversationalToneCheck').checked;
@@ -927,7 +927,7 @@
       
 ${timeAndLandingStatement}, and another ${taxiTimeValue} minutes thereafter to the gate.
 
-Current Weather in ${displayArrivalShortName} ${weatherFull}.
+Current Weather in ${displayArrivalShortName} is reported to ${weatherFull}.
 I trust that you have enjoyed your stay with us today, and it has been a pleasure having you onboard. On behalf of Captain ________ and the rest of the crew, we would like to thank you once again for choosing to flying with ${airlineName}. 
 Cabin crew, please prepare for arrival.`; 
 
