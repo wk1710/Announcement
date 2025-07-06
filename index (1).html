@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arrival Announcement Tool - Singapore Airlines</title>
+  <style>
+    /* General Styles - Adapted */
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 100%;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background-color: #f4f7f6;
+      color: #333;
+    }
+    .container {
+      width: 100%;
+      max-width: 750px;
+      background-color: #ffffff;
+      color: #333;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 25px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Heading Area */
+    .heading-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .heading-container h3 {
+        margin: 0;
+        font-size: 22px;
+        color: #00529b;
+    }
+    .controls-group {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* Form & Input Styles */
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end; 
+    }
+     /* Specific styling for the airport selection row */
+    #airportSelectionRow {
+        flex-wrap: nowrap; /* Prevent wrapping */
+        align-items: flex-start; /* Align items to the top of the row */
+    }
+    #airportSelectionRow > .airport-group {
+        flex-basis: 40%; /* Adjust basis to make more room */
+        flex-grow: 1;
+        min-width: 200px; /* Ensure they don't get too small */
+    }
+    #airportSelectionRow > .swap-button-container {
+        flex-grow: 0;
+        flex-shrink: 0;
+        align-self: center; /* Vertically center the swap button */
+        padding: 0 10px; /* Add some horizontal padding for spacing */
+        margin-top: 20px; /* Approximate alignment with search boxes */
+    }
+
+
+    .form-row .form-group, .airport-group .form-group { /* General form group styling */
+        flex: 1;
+        min-width: 200px;
+    }
+     .form-row .form-group.fixed-width {
+        flex: 0 1 120px;
+        min-width: 100px;
+    }
+    .airport-group { 
+       display: flex;
+       flex-direction: column;
+       gap: 5px; 
+    }
+     .airport-group .search-and-select {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .airport-group .home-base-check, .check-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.85em;
+        margin-top: 2px;
+    }
+     .airport-group .home-base-check label, .check-item label {
+        font-weight: normal; 
+        margin-bottom: 0; 
+     }
+     .airport-group .home-base-check input[type="checkbox"], .check-item input[type="checkbox"] {
+         width: auto; 
+     }
+
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+    .form-group label {
+      font-weight: 600;
+      color: #555;
+      font-size: 0.85em;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="time"],
+    .form-group select,
+    .form-group textarea {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      width: 100%;
+      background-color: #fff;
+      color: #333;
+      transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+    }
+     #announcementOutput {
+        background-color: #fff; 
+        border: 1px solid #ccc;
+     }
+     #announcementOutput:focus {
+        border-color: #00529b;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 82, 155, 0.2);
+     }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { 
+      border-color: #00529b;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 82, 155, 0.2);
+    }
+     .form-group input.airport-search {
+        font-style: italic;
+        font-size: 0.9em;
+        padding: 6px 8px;
+    }
+    .form-group textarea {
+        resize: vertical;
+        min-height: 150px; 
+    }
+    .time-input-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .time-input-group input {
+        width: 60px;
+        text-align: center;
+    }
+    .time-input-group span {
+        font-weight: bold;
+    }
+    .dst-offset-group {
+        margin-top: 5px;
+        padding: 8px;
+        background-color: #f0f8ff;
+        border: 1px solid #cce5ff;
+        border-radius: 4px;
+        font-size: 0.85em;
+    }
+    .dst-offset-group label {
+        font-size: 0.95em;
+    }
+    .dst-offset-group input[type="number"] {
+        width: 80px;
+        padding: 6px;
+        font-size: 0.95em;
+        margin-left: 5px;
+    }
+
+
+    /* Buttons */
+    .button-toolbar {
+        margin-top: 25px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+     .settings-toolbar {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-start;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+        flex-wrap: wrap;
+    }
+    .button {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      background-color: #00529b;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.2s;
+      text-align: center;
+    }
+    .button:hover {
+      background-color: #003d73;
+    }
+    .button.secondary {
+        background-color: #6c757d;
+    }
+    .button.secondary:hover {
+        background-color: #545b62;
+    }
+     .button.utility {
+        background-color: #5cb85c;
+        font-size: 0.85em;
+        padding: 8px 12px;
+    }
+    .button.utility.load {
+        background-color: #f0ad4e;
+    }
+    .button.utility:hover {
+        opacity: 0.85;
+    }
+     #swapAirportsButton {
+        padding: 6px 10px;
+        font-size: 1.2em; 
+        line-height: 1;
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        color: #495057;
+        cursor: pointer;
+        border-radius: 5px;
+     }
+     #swapAirportsButton:hover {
+        background-color: #dee2e6;
+     }
+
+
+    #announcementOutput {
+      margin-top: 20px;
+      padding: 15px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s; 
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+      vertical-align: middle;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px; width: 16px;
+      left: 2px; bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #00529b; }
+    input:focus + .slider { box-shadow: 0 0 1px #00529b; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Night Mode Styles */
+    body.night-mode {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+    }
+    .night-mode .container {
+        background-color: #34495e;
+        color: #ecf0f1;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .night-mode .heading-container {
+        border-bottom: 1px solid #4a6fa5;
+    }
+    .night-mode .heading-container h3 {
+        color: #5dade2;
+    }
+    .night-mode .form-group label, .night-mode .home-base-check label, .night-mode .check-item label { /* Added .check-item */
+        color: #bdc3c7;
+    }
+    .night-mode .form-group input[type="text"],
+    .night-mode .form-group input[type="number"],
+    .night-mode .form-group input[type="time"],
+    .night-mode .form-group select,
+    .night-mode .form-group textarea {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        border: 1px solid #566573;
+    }
+     .night-mode #announcementOutput {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        border: 1px solid #566573;
+     }
+     .night-mode #announcementOutput:focus {
+        border-color: #5dade2;
+        box-shadow: 0 0 0 2px rgba(93, 173, 226, 0.2);
+     }
+     .night-mode #swapAirportsButton {
+        background-color: #4a6278;
+        border-color: #566573;
+        color: #bdc3c7;
+     }
+      .night-mode #swapAirportsButton:hover {
+        background-color: #526f8c;
+     }
+
+
+    .night-mode .form-group input:focus,
+    .night-mode .form-group select:focus,
+    .night-mode .form-group textarea:focus { 
+      border-color: #5dade2;
+      box-shadow: 0 0 0 2px rgba(93, 173, 226, 0.2);
+    }
+
+    .night-mode .button {
+        background-color: #5dade2;
+        color: #2c3e50;
+    }
+    .night-mode .button:hover {
+        background-color: #85c1e9;
+    }
+    .night-mode .button.secondary {
+        background-color: #7f8c8d;
+        color: #ecf0f1;
+    }
+    .night-mode .button.secondary:hover {
+        background-color: #95a5a6;
+    }
+     .night-mode .button.utility {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .night-mode .button.utility.load {
+        background-color: #FF9800;
+        color: white;
+    }
+    .night-mode .settings-toolbar {
+        border-top: 1px solid #4a6fa5;
+    }
+    .night-mode .dst-offset-group {
+        background-color: #2c3e50;
+        border: 1px solid #566573;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="heading-container">
+      <h3>Arrival Announcement Tool</h3>
+      <div class="controls-group">
+        <label class="switch" title="Toggle Day/Night Mode">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-section">
+        <div class="form-group">
+            <label for="speakerRole">Speaker Role</label>
+            <select id="speakerRole">
+                <option value="Captain" selected>Captain</option>
+                <option value="First Officer">First Officer</option>
+                <option value="Senior First Officer">Senior First Officer</option>
+                <option value="Pilot">Pilot</option>
+            </select>
+        </div>
+
+      <div class="form-row" id="airportSelectionRow">
+          <div class="airport-group">
+            <div class="search-and-select form-group">
+                <label for="originAirportSearch">Search Origin (ICAO/IATA)</label>
+                <input type="text" id="originAirportSearch" class="airport-search">
+                <label for="originAirport" class="hidden">Origin Airport</label>
+                <select id="originAirport"></select>
+            </div>
+            <div class="home-base-check">
+                 <input type="checkbox" id="originHomeBaseCheck">
+                 <label for="originHomeBaseCheck">Set Origin to Home Base (WSSS)</label>
+            </div>
+          </div>
+          
+          <div class="swap-button-container">
+             <button id="swapAirportsButton" title="Swap Origin and Arrival Airports">⇆</button>
+          </div>
+
+          <div class="airport-group">
+             <div class="search-and-select form-group">
+                <label for="arrivalAirportSearch">Search Arrival (ICAO/IATA)</label>
+                <input type="text" id="arrivalAirportSearch" class="airport-search">
+                <label for="arrivalAirport" class="hidden">Arrival Airport</label>
+                <select id="arrivalAirport"></select>
+             </div>
+             <div class="home-base-check">
+                 <input type="checkbox" id="arrivalHomeBaseCheck">
+                 <label for="arrivalHomeBaseCheck">Set Arrival to Home Base (WSSS)</label>
+             </div>
+          </div>
+      </div>
+      
+      <div id="arrivalGmtOffsetManualGroup" class="form-group dst-offset-group hidden">
+        <label for="arrivalGmtOffsetManualInput">Effective Arrival GMT Offset (adjust for DST):</label>
+        <input type="number" id="arrivalGmtOffsetManualInput" step="0.25">
+      </div>
+
+
+      <div class="form-row">
+          <div class="form-group fixed-width">
+            <label for="todMinutes">Descent In (mins)</label>
+            <input type="number" id="todMinutes" value="10" min="1" max="60">
+          </div>
+          <div class="form-group">
+            <label for="arrivalTimeZuluHH">Est. Arrival Time (Zulu)</label>
+            <div class="time-input-group">
+              <input type="number" id="arrivalTimeZuluHH" placeholder="HH" min="0" max="23">
+              <span>:</span>
+              <input type="number" id="arrivalTimeZuluMM" placeholder="MM" min="0" max="59">
+              <span>Z</span>
+            </div>
+          </div>
+      </div>
+
+      <div class="form-row">
+          <div class="form-group">
+            <label for="weatherPhenomena">Weather at Destination</label>
+            <select id="weatherPhenomena"></select>
+          </div>
+          <div class="form-group fixed-width">
+            <label for="temperature">Temp (°C)</label>
+            <input type="number" id="temperature" value="28" min="-50" max="60">
+          </div>
+      </div>
+
+       <div class="form-group">
+        <label for="taxiTime">Estimated Taxi Time to Gate</label>
+        <select id="taxiTime">
+            <option value="5 to 10">5-10 mins</option>
+            <option value="10 to 15" selected>10-15 mins</option>
+            <option value="15 to 20">15-20 mins</option>
+            <option value="20 to 25">20-25 mins</option>
+            <option value="approximately 30">approx. 30 mins</option>
+        </select>
+      </div>
+
+      <div class="check-item form-group"> <input type="checkbox" id="conversationalToneCheck" checked>
+          <label for="conversationalToneCheck">Conversational Tone</label>
+      </div>
+
+    </div>
+
+    <div class="button-toolbar">
+      <button id="generateButton" class="button">Generate Announcement</button>
+      <button id="copyButton" class="button secondary">Copy to Clipboard</button>
+    </div>
+     <div class="settings-toolbar">
+        <button id="saveAnnouncementButton" class="button utility">Save Announcement</button>
+        <button id="loadAnnouncementButton" class="button utility load">Load Announcement</button>
+        <input type="file" id="fileInput" accept=".sqaa" style="display: none;">
+    </div>
+
+
+    <div class="form-group" style="margin-top: 20px;">
+        <label for="announcementOutput">Generated Announcement (Editable)</label>
+        <textarea id="announcementOutput" rows="10"></textarea> 
+    </div>
+
+  </div>
+
+  <script>
+    const airportData = { 
+      "WSSS": { iata: "SIN", name: "Singapore Changi Airport", standardGmtOffset: 8, announcementName: "Singapore Changi Airport", shortName: "Singapore" },
+      "WADD": { iata: "DPS", name: "Denpasar Ngurah Rai International Airport", standardGmtOffset: 8, announcementName: "Denpasar Ngurah Rai International Airport", shortName: "Denpasar" },
+      "WIDD": { iata: "KNO", name: "Medan Kualanamu International Airport", standardGmtOffset: 7, announcementName: "Medan Kualanamu International Airport", shortName: "Medan" },
+      "WMKJ": { iata: "PEN", name: "Penang International Airport", standardGmtOffset: 8, announcementName: "Penang International Airport", shortName: "Penang" },
+      "WSAP": { iata: "QPG", name: "Singapore Paya Lebar Air Base", standardGmtOffset: 8, announcementName: "Singapore Paya Lebar Air Base", shortName: "Paya Lebar" },
+      "VVTS": { iata: "SGN", name: "Ho Chi Minh City Tan Son Nhat International Airport", standardGmtOffset: 7, announcementName: "Ho Chi Minh City Tan Son Nhat International Airport", shortName: "Ho Chi Minh City" },
+      "YPPH": { iata: "PER", name: "Perth Airport", standardGmtOffset: 8, announcementName: "Perth Airport", shortName: "Perth" },
+      "YPAD": { iata: "ADL", name: "Adelaide Airport", standardGmtOffset: 9.5, hasDST: true, announcementName: "Adelaide Airport", shortName: "Adelaide" },
+      "YSSY": { iata: "SYD", name: "Sydney Kingsford Smith Airport", standardGmtOffset: 10, hasDST: true, announcementName: "Sydney Kingsford Smith Airport", shortName: "Sydney" },
+      "YMML": { iata: "MEL", name: "Melbourne Airport", standardGmtOffset: 10, hasDST: true, announcementName: "Melbourne Airport", shortName: "Melbourne" },
+      "YBBN": { iata: "BNE", name: "Brisbane Airport", standardGmtOffset: 10, announcementName: "Brisbane Airport", shortName: "Brisbane" },
+      "NZAA": { iata: "AKL", name: "Auckland Airport", standardGmtOffset: 12, hasDST: true, announcementName: "Auckland Airport", shortName: "Auckland" },
+      "NZCH": { iata: "CHC", name: "Christchurch International Airport", standardGmtOffset: 12, hasDST: true, announcementName: "Christchurch International Airport", shortName: "Christchurch" },
+      "VIDP": { iata: "DEL", name: "Delhi Indira Gandhi International Airport", standardGmtOffset: 5.5, announcementName: "Delhi Indira Gandhi International Airport", shortName: "Delhi" },
+      "VABB": { iata: "BOM", name: "Mumbai Chhatrapati Shivaji Maharaj International Airport", standardGmtOffset: 5.5, announcementName: "Mumbai Chhatrapati Shivaji Maharaj International Airport", shortName: "Mumbai" },
+      "VOBL": { iata: "BLR", name: "Bengaluru Kempegowda International Airport", standardGmtOffset: 5.5, announcementName: "Bengaluru Kempegowda International Airport", shortName: "Bengaluru" },
+      "VOMM": { iata: "MAA", name: "Chennai International Airport", standardGmtOffset: 5.5, announcementName: "Chennai Airport, Anna International Terminal", shortName: "Chennai" },
+      "VOHS": { iata: "HYD", name: "Hyderabad Rajiv Gandhi International Airport", standardGmtOffset: 5.5, announcementName: "Hyderabad Rajiv Gandhi International Airport", shortName: "Hyderabad" },
+      "VOGO": { iata: "GOI", name: "Goa Dabolim Airport", standardGmtOffset: 5.5, announcementName: "Goa Dabolim Airport", shortName: "Goa" },
+      "VOTV": { iata: "TRV", name: "Thiruvananthapuram International Airport", standardGmtOffset: 5.5, announcementName: "Thiruvananthapuram International Airport", shortName: "Thiruvananthapuram" },
+      "VGHS": { iata: "DAC", name: "Dhaka Shahjalal International Airport", standardGmtOffset: 6, announcementName: "Dhaka Shahjalal International Airport", shortName: "Dhaka" },
+      "VCBI": { iata: "CMB", name: "Colombo Bandaranaike International Airport", standardGmtOffset: 5.5, announcementName: "Colombo Bandaranaike International Airport", shortName: "Colombo" },
+      "VRMM": { iata: "MLE", name: "Malé Velana International Airport", standardGmtOffset: 5, announcementName: "Malé Velana International Airport", shortName: "Malé" },
+      "VNKT": { iata: "KTM", name: "Kathmandu Tribhuvan International Airport", standardGmtOffset: 5.75, announcementName: "Kathmandu Tribhuvan International Airport", shortName: "Kathmandu" },
+      "RKSI": { iata: "ICN", name: "Seoul Incheon International Airport", standardGmtOffset: 9, announcementName: "Seoul Incheon International Airport", shortName: "Seoul" },
+      "RJAA": { iata: "NRT", name: "Tokyo Narita International Airport", standardGmtOffset: 9, announcementName: "Tokyo Narita International Airport", shortName: "Tokyo" }, 
+      "RJBB": { iata: "KIX", name: "Osaka Kansai International Airport", standardGmtOffset: 9, announcementName: "Osaka Kansai International Airport", shortName: "Osaka" },
+      "RJFF": { iata: "FUK", name: "Fukuoka Airport", standardGmtOffset: 9, announcementName: "Fukuoka Airport", shortName: "Fukuoka" },
+      "RJGG": { iata: "NGO", name: "Nagoya Chubu Centrair International Airport", standardGmtOffset: 9, announcementName: "Nagoya Chubu Centrair International Airport", shortName: "Nagoya" },
+      "ROAH": { iata: "OKA", name: "Naha Airport (Okinawa)", standardGmtOffset: 9, announcementName: "Naha Airport", shortName: "Naha" },
+      "VTBS": { iata: "BKK", name: "Bangkok Suvarnabhumi Airport", standardGmtOffset: 7, announcementName: "Bangkok Suvarnabhumi Airport", shortName: "Bangkok" },
+      "VTSG": { iata: "HKT", name: "Phuket International Airport", standardGmtOffset: 7, announcementName: "Phuket International Airport", shortName: "Phuket"},
+      "ZBAA": { iata: "PEK", name: "Beijing Capital International Airport", standardGmtOffset: 8, announcementName: "Beijing Capital International Airport", shortName: "Beijing" },
+      "ZBAD": { iata: "PKX", name: "Beijing Daxing International Airport", standardGmtOffset: 8, announcementName: "Beijing Daxing International Airport", shortName: "Beijing" },
+      "ZSPD": { iata: "PVG", name: "Shanghai Pudong International Airport", standardGmtOffset: 8, announcementName: "Shanghai Pudong International Airport", shortName: "Shanghai" },
+      "ZGGG": { iata: "CAN", name: "Guangzhou Baiyun International Airport", standardGmtOffset: 8, announcementName: "Guangzhou Baiyun International Airport", shortName: "Guangzhou" },
+      "ZGSZ": { iata: "SZX", name: "Shenzhen Bao'an International Airport", standardGmtOffset: 8, announcementName: "Shenzhen Bao'an International Airport", shortName: "Shenzhen" },
+      "ZUCK": { iata: "CKG", name: "Chongqing Jiangbei International Airport", standardGmtOffset: 8, announcementName: "Chongqing Jiangbei International Airport", shortName: "Chongqing" },
+      "ZGHA": { iata: "CSX", name: "Changsha Huanghua International Airport", standardGmtOffset: 8, announcementName: "Changsha Huanghua International Airport", shortName: "Changsha" },
+      "RCKH": { iata: "KHH", name: "Kaohsiung International Airport", standardGmtOffset: 8, announcementName: "Kaohsiung International Airport", shortName: "Kaohsiung" },
+      "RCTP": { iata: "TPE", name: "Taipei Taoyuan International Airport", standardGmtOffset: 8, announcementName: "Taipei Taoyuan International Airport", shortName: "Taipei" },
+      "VHHH": { iata: "HKG", name: "Hong Kong International Airport", standardGmtOffset: 8, announcementName: "Hong Kong International Airport", shortName: "Hong Kong" },
+      "VMMC": { iata: "MFM", name: "Macau International Airport", standardGmtOffset: 8, announcementName: "Macau International Airport", shortName: "Macau" },
+      "RPLL": { iata: "MNL", name: "Manila Ninoy Aquino International Airport", standardGmtOffset: 8, announcementName: "Manila Ninoy Aquino International Airport", shortName: "Manila" },
+      "RPVM": { iata: "CEB", name: "Cebu Mactan-Cebu International Airport", standardGmtOffset: 8, announcementName: "Cebu Mactan-Cebu International Airport", shortName: "Cebu" },
+      "WMKK": { iata: "KUL", name: "Kuala Lumpur International Airport", standardGmtOffset: 8, announcementName: "Kuala Lumpur International Airport", shortName: "Kuala Lumpur" },
+      "WBKK": { iata: "BKI", name: "Kota Kinabalu International Airport", standardGmtOffset: 8, announcementName: "Kota Kinabalu International Airport", shortName: "Kota Kinabalu" },
+      "WBGR": { iata: "KCH", name: "Kuching International Airport", standardGmtOffset: 8, announcementName: "Kuching International Airport", shortName: "Kuching" },
+      "WMKL": { iata: "LGK", name: "Langkawi International Airport", standardGmtOffset: 8, announcementName: "Langkawi International Airport", shortName: "Langkawi" },
+      "WBSB": { iata: "BWN", name: "Brunei International Airport", standardGmtOffset: 8, announcementName: "Brunei International Airport", shortName: "Bandar Seri Begawan" },
+      "VYYY": { iata: "RGN", name: "Yangon International Airport", standardGmtOffset: 6.5, announcementName: "Yangon International Airport", shortName: "Yangon" },
+      "VDPP": { iata: "PNH", name: "Phnom Penh International Airport", standardGmtOffset: 7, announcementName: "Phnom Penh International Airport", shortName: "Phnom Penh" },
+      "VDSR": { iata: "REP", name: "Siem Reap Angkor International Airport", standardGmtOffset: 7, announcementName: "Siem Reap Angkor International Airport", shortName: "Siem Reap" },
+      "VVNB": { iata: "HAN", name: "Hanoi Noi Bai International Airport", standardGmtOffset: 7, announcementName: "Hanoi Noi Bai International Airport", shortName: "Hanoi" },
+      "WARR": { iata: "SUB", name: "Surabaya Juanda International Airport", standardGmtOffset: 7, announcementName: "Surabaya Juanda International Airport", shortName: "Surabaya" },
+      "WIII": { iata: "CGK", name: "Jakarta Soekarno-Hatta International Airport", standardGmtOffset: 7, announcementName: "Jakarta Soekarno-Hatta International Airport", shortName: "Jakarta" },
+      "OMDB": { iata: "DXB", name: "Dubai International Airport", standardGmtOffset: 4, announcementName: "Dubai International Airport", shortName: "Dubai" },
+      "OTHH": { iata: "DOH", name: "Doha Hamad International Airport", standardGmtOffset: 3, announcementName: "Doha Hamad International Airport", shortName: "Doha" },
+      "LFPG": { iata: "CDG", name: "Paris Charles de Gaulle Airport", standardGmtOffset: 1, hasDST: true, announcementName: "Paris Charles de Gaulle Airport", shortName: "Paris" },
+      "EGLL": { iata: "LHR", name: "London Heathrow Airport", standardGmtOffset: 0, hasDST: true, announcementName: "London Heathrow Airport", shortName: "London" },
+      "EDDF": { iata: "FRA", name: "Frankfurt Airport", standardGmtOffset: 1, hasDST: true, announcementName: "Frankfurt Airport", shortName: "Frankfurt" },
+      "EHAM": { iata: "AMS", name: "Amsterdam Schiphol Airport", standardGmtOffset: 1, hasDST: true, announcementName: "Amsterdam Schiphol Airport", shortName: "Amsterdam" },
+      "LSZH": { iata: "ZRH", name: "Zurich Airport", standardGmtOffset: 1, hasDST: true, announcementName: "Zurich Airport", shortName: "Zurich" },
+      "LIMC": { iata: "MXP", name: "Milan Malpensa Airport", standardGmtOffset: 1, hasDST: true, announcementName: "Milan Malpensa Airport", shortName: "Milan" },
+      "LEMD": { iata: "MAD", name: "Madrid Barajas Airport", standardGmtOffset: 1, hasDST: true, announcementName: "Madrid Barajas Airport", shortName: "Madrid" },
+      "KJFK": { iata: "JFK", name: "New York John F. Kennedy International Airport", standardGmtOffset: -5, hasDST: true, announcementName: "New York John F. Kennedy International Airport", shortName: "New York" },
+      "KLAX": { iata: "LAX", name: "Los Angeles International Airport", standardGmtOffset: -8, hasDST: true, announcementName: "Los Angeles International Airport", shortName: "Los Angeles" },
+      "KSFO": { iata: "SFO", name: "San Francisco International Airport", standardGmtOffset: -8, hasDST: true, announcementName: "San Francisco International Airport", shortName: "San Francisco" },
+      "KIAH": { iata: "IAH", name: "Houston George Bush Intercontinental Airport", standardGmtOffset: -6, hasDST: true, announcementName: "Houston George Bush Intercontinental Airport", shortName: "Houston" },
+      "KORD": { iata: "ORD", name: "Chicago O'Hare International Airport", standardGmtOffset: -6, hasDST: true, announcementName: "Chicago O'Hare International Airport", shortName: "Chicago" },
+      "CYYZ": { iata: "YYZ", name: "Toronto Pearson International Airport", standardGmtOffset: -5, hasDST: true, announcementName: "Toronto Pearson International Airport", shortName: "Toronto" },
+      "CYVR": { iata: "YVR", name: "Vancouver International Airport", standardGmtOffset: -8, hasDST: true, announcementName: "Vancouver International Airport", shortName: "Vancouver" },
+      "FACT": { iata: "CPT", name: "Cape Town International Airport", standardGmtOffset: 2, announcementName: "Cape Town International Airport", shortName: "Cape Town" },
+      "FAOR": { iata: "JNB", name: "Johannesburg O. R. Tambo International Airport", standardGmtOffset: 2, announcementName: "Johannesburg O. R. Tambo International Airport", shortName: "Johannesburg" }
+    };
+
+    const weatherPhenomenaList = [
+        "Partly Cloudy", "Clear Sky", "Few Clouds", "Scattered Clouds", "Broken Clouds", "Overcast",
+        "Mist", "Fog", "Shallow Fog", "Patches of Fog", "Haze", "Smoke",
+        "Light Drizzle", "Drizzle", "Heavy Drizzle",
+        "Light Rain", "Rain", "Heavy Rain",
+        "Light Showers", "Showers", "Heavy Showers",
+        "Thunderstorm without Precipitation", "Thunderstorm with Light Rain", "Thunderstorm with Rain", "Thunderstorm with Heavy Rain",
+        "Light Snow", "Snow", "Heavy Snow", "Light Snow Showers", "Snow Showers", "Heavy Snow Showers",
+        "Freezing Drizzle", "Freezing Rain", "Blowing Snow", "Sandstorm", "Duststorm", "Squalls", "Volcanic Ash"
+    ];
+    
+    const weatherPresentation = {
+        "Partly Cloudy": "is partly cloudy",
+        "Clear Sky": "has clear skies",
+        "Few Clouds": "has a few clouds",
+        "Scattered Clouds": "has scattered clouds",
+        "Broken Clouds": "has broken clouds",
+        "Overcast": "is overcast",
+        "Mist": "is misty",
+        "Fog": "is foggy",
+        "Shallow Fog": "has shallow fog",
+        "Patches of Fog": "has patches of fog",
+        "Haze": "is hazy",
+        "Smoke": "is smoky",
+        "Light Drizzle": "has light drizzle",
+        "Drizzle": "has drizzle",
+        "Heavy Drizzle": "has heavy drizzle",
+        "Light Rain": "has light rain",
+        "Rain": "has rain",
+        "Heavy Rain": "has heavy rain",
+        "Light Showers": "has light showers",
+        "Showers": "has showers",
+        "Heavy Showers": "has heavy showers",
+        "Thunderstorm without Precipitation": "has thunderstorm activity nearby",
+        "Thunderstorm with Light Rain": "has thunderstorms with light rain",
+        "Thunderstorm with Rain": "has thunderstorms and rain",
+        "Thunderstorm with Heavy Rain": "has thunderstorms with heavy rain",
+        "Light Snow": "has light snow",
+        "Snow": "has snow",
+        "Heavy Snow": "has heavy snow",
+        "Light Snow Showers": "has light snow showers",
+        "Snow Showers": "has snow showers",
+        "Heavy Snow Showers": "has heavy snow showers",
+        "Freezing Drizzle": "has freezing drizzle",
+        "Freezing Rain": "has freezing rain",
+        "Blowing Snow": "has blowing snow",
+        "Sandstorm": "is experiencing a sandstorm",
+        "Duststorm": "is experiencing a duststorm",
+        "Squalls": "is experiencing squalls",
+        "Volcanic Ash": "has reports of volcanic ash"
+    };
+
+
+    const airlineName = "Singapore Airlines";
+    const announcementDataFileName = "SQ_ArrivalAnnouncementData.sqaa";
+
+    function populateAirportDropdowns() {
+      const originSelect = document.getElementById('originAirport');
+      const arrivalSelect = document.getElementById('arrivalAirport');
+      const sortedAirportCodes = Object.keys(airportData).sort((a,b) => 
+        (airportData[a].announcementName || airportData[a].name).localeCompare(airportData[b].announcementName || airportData[b].name)
+      );
+
+      originSelect.innerHTML = '<option value="">Select Origin Airport</option>';
+      arrivalSelect.innerHTML = '<option value="">Select Arrival Airport</option>';
+
+      sortedAirportCodes.forEach(code => {
+        const airport = airportData[code];
+        const optionText = `${airport.announcementName || airport.name} (${code}${airport.iata ? '/' + airport.iata : ''})`;
+        
+        const optionOrigin = document.createElement('option');
+        optionOrigin.value = code;
+        optionOrigin.textContent = optionText;
+        originSelect.appendChild(optionOrigin);
+        
+        const optionArrival = document.createElement('option');
+        optionArrival.value = code;
+        optionArrival.textContent = optionText;
+        arrivalSelect.appendChild(optionArrival);
+      });
+    }
+
+    function populateWeatherDropdown() {
+        const weatherSelect = document.getElementById('weatherPhenomena');
+        weatherPhenomenaList.forEach(phenomenon => {
+            const option = document.createElement('option');
+            option.value = phenomenon;
+            option.textContent = phenomenon;
+            weatherSelect.appendChild(option);
+        });
+        weatherSelect.value = "Partly Cloudy";
+    }
+    
+    function setupAirportSearch(searchInputId, selectDropdownId, homeBaseCheckboxId) {
+        const searchInput = document.getElementById(searchInputId);
+        const selectDropdown = document.getElementById(selectDropdownId);
+        const homeBaseCheckbox = document.getElementById(homeBaseCheckboxId);
+        const otherCheckboxId = homeBaseCheckboxId === 'originHomeBaseCheck' ? 'arrivalHomeBaseCheck' : 'originHomeBaseCheck';
+        const otherCheckbox = document.getElementById(otherCheckboxId);
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.trim().toUpperCase();
+            homeBaseCheckbox.checked = false; 
+            if (!searchTerm) return;
+            let foundAirportICAO = null;
+            for (const icao in airportData) {
+                 const airport = airportData[icao];
+                 if (airport.iata && airport.iata.toUpperCase() === searchTerm) {
+                      foundAirportICAO = icao; break;
+                 }
+            }
+            if (!foundAirportICAO) {
+                 for (const icao in airportData) {
+                      if (icao.toUpperCase().startsWith(searchTerm)) {
+                           foundAirportICAO = icao; break; 
+                      }
+                 }
+            }
+
+            if (foundAirportICAO) {
+                selectDropdown.value = foundAirportICAO;
+                const event = new Event('change', { bubbles: true });
+                selectDropdown.dispatchEvent(event);
+            }
+        });
+        
+        selectDropdown.addEventListener('change', function() {
+             if (document.activeElement !== searchInput) { 
+                  searchInput.value = '';
+             }
+             if (this.value !== 'WSSS' && homeBaseCheckbox.checked) {
+                  homeBaseCheckbox.checked = false;
+             }
+             if (this.value === 'WSSS' && otherCheckbox.checked) {
+                 otherCheckbox.checked = false;
+             }
+             if (selectDropdownId === 'arrivalAirport') {
+                handleArrivalAirportChange();
+             }
+        });
+
+        homeBaseCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                if (otherCheckbox.checked) {
+                    otherCheckbox.checked = false;
+                }
+                selectDropdown.value = 'WSSS';
+                searchInput.value = ''; 
+                const event = new Event('change', { bubbles: true });
+                selectDropdown.dispatchEvent(event);
+            }
+        });
+    }
+
+    function handleArrivalAirportChange() {
+        const arrivalCode = document.getElementById('arrivalAirport').value;
+        const manualGmtGroup = document.getElementById('arrivalGmtOffsetManualGroup');
+        const manualGmtInput = document.getElementById('arrivalGmtOffsetManualInput');
+
+        if (arrivalCode && airportData[arrivalCode]) {
+            const airport = airportData[arrivalCode];
+            if (airport.hasDST) {
+                if(!manualGmtInput.value || isNaN(parseFloat(manualGmtInput.value))) {
+                     manualGmtInput.value = airport.standardGmtOffset;
+                }
+                manualGmtGroup.classList.remove('hidden');
+            } else {
+                manualGmtGroup.classList.add('hidden');
+                manualGmtInput.value = '';
+            }
+        } else {
+            manualGmtGroup.classList.add('hidden');
+            manualGmtInput.value = '';
+        }
+    }
+    
+    function getEffectiveArrivalGmtOffset(arrivalCode) {
+        if (!arrivalCode || !airportData[arrivalCode]) return null;
+        const airport = airportData[arrivalCode];
+        const manualGmtGroup = document.getElementById('arrivalGmtOffsetManualGroup');
+        const manualGmtInput = document.getElementById('arrivalGmtOffsetManualInput');
+
+        if (airport.hasDST && !manualGmtGroup.classList.contains('hidden')) {
+            const manualOffset = parseFloat(manualGmtInput.value);
+            if (!isNaN(manualOffset)) return manualOffset;
+        }
+        return airport.standardGmtOffset;
+    }
+
+    function calculateLocalTime(zuluHH, zuluMM, gmtOffset) {
+      if (isNaN(zuluHH) || isNaN(zuluMM) || typeof gmtOffset === 'undefined' || gmtOffset === null || isNaN(parseFloat(gmtOffset))) {
+        return { hours: -1, minutes: -1 };
+      }
+      let totalMinutesUTC = parseInt(zuluHH) * 60 + parseInt(zuluMM);
+      let gmtOffsetMinutes = Math.round(parseFloat(gmtOffset) * 60);
+      let localTotalMinutes = totalMinutesUTC + gmtOffsetMinutes;
+      localTotalMinutes = (localTotalMinutes + 1440 * 2) % 1440;
+      let localHours = Math.floor(localTotalMinutes / 60);
+      let localMinutes = localTotalMinutes % 60;
+      return { hours: localHours, minutes: localMinutes };
+    }
+    
+    function getDescriptivePeriod(hours24) {
+        if (hours24 >= 5 && hours24 < 12) return "in the morning";
+        else if (hours24 >= 12 && hours24 < 17) return "in the afternoon";
+        else if (hours24 >= 17 && hours24 < 21) return "in the evening";
+        else return "at night";
+    }
+
+    function formatLocalTimeConversational(hours24, minutes) {
+        if (hours24 === -1) return "--:-- local time"; 
+        
+        const useConversational = document.getElementById('conversationalToneCheck').checked;
+        let h12 = hours24 % 12;
+        if (h12 === 0) h12 = 12;
+        const period = hours24 < 12 ? "AM" : "PM";
+        const minutesPadded = String(minutes).padStart(2, '0');
+
+        let timeString;
+        let suffix = " local time";
+
+        if (useConversational) {
+            if (minutes === 0) {
+                if (hours24 === 12) timeString = "12 noon";
+                else if (hours24 === 0) timeString = "12 midnight";
+                else timeString = `${h12} ${period}`;
+            } else if (minutes === 30) {
+                timeString = `half past ${h12} ${getDescriptivePeriod(hours24)}`;
+                suffix = ""; // No "local time" needed here
+            } else if (minutes >= 1 && minutes <= 5) {
+                timeString = `${minutes} minute${minutes > 1 ? 's' : ''} past ${h12} ${getDescriptivePeriod(hours24)}`;
+                suffix = ""; // No "local time" needed here
+            } else if (minutes >= 55 && minutes <= 59) {
+                const minutesToNextHour = 60 - minutes;
+                let nextHour12 = (hours24 + 1) % 12;
+                if (nextHour12 === 0) nextHour12 = 12;
+                timeString = `${minutesToNextHour} minute${minutesToNextHour > 1 ? 's' : ''} to ${nextHour12} ${getDescriptivePeriod((hours24 + 1) % 24)}`;
+                suffix = ""; // No "local time" needed here
+            } else {
+                timeString = `${h12}:${minutesPadded} ${period}`;
+            }
+        } else { // Not conversational
+            if (minutes === 0) {
+                if (hours24 === 12) timeString = "12 noon";
+                else if (hours24 === 0) timeString = "12 midnight";
+                else timeString = `${h12} ${period}`;
+            } else {
+                 timeString = `${h12}:${minutesPadded} ${period}`;
+            }
+        }
+        return timeString + suffix;
+    }
+
+
+    function generateAnnouncement() {
+      const speakerRole = document.getElementById('speakerRole').value;
+      const originCode = document.getElementById('originAirport').value;
+      const arrivalCode = document.getElementById('arrivalAirport').value;
+      const todMinutes = document.getElementById('todMinutes').value;
+      const arrivalZuluHH = parseInt(document.getElementById('arrivalTimeZuluHH').value);
+      const arrivalZuluMM = parseInt(document.getElementById('arrivalTimeZuluMM').value);
+      const selectedWeatherPhenomenon = document.getElementById('weatherPhenomena').value;
+      const temperature = document.getElementById('temperature').value;
+      const taxiTimeValue = document.getElementById('taxiTime').value;
+
+      if (!originCode || !arrivalCode) { alert("Please select both origin and arrival airports."); return; }
+      if (originCode === arrivalCode) { alert("Origin and Arrival airports cannot be the same."); return; } 
+      if (isNaN(arrivalZuluHH) || isNaN(arrivalZuluMM) || arrivalZuluHH < 0 || arrivalZuluHH > 23 || arrivalZuluMM < 0 || arrivalZuluMM > 59) { alert("Please enter a valid Zulu arrival time (HH:MM)."); return; }
+      if (isNaN(parseInt(temperature))) { alert("Please enter a valid temperature."); return; }
+
+      const originAirportDetails = airportData[originCode];
+      const arrivalAirportDetails = airportData[arrivalCode];
+      if (!originAirportDetails || !arrivalAirportDetails) { alert("Selected airport data not found."); return; }
+      
+      const effectiveArrivalGmt = getEffectiveArrivalGmtOffset(arrivalCode);
+      if (effectiveArrivalGmt === null) { alert("Could not determine effective GMT offset for arrival airport."); return; }
+
+      const localArrivalTime = calculateLocalTime(arrivalZuluHH, arrivalZuluMM, effectiveArrivalGmt);
+      const conversationalLocalTime = formatLocalTimeConversational(localArrivalTime.hours, localArrivalTime.minutes);
+      
+      const displayArrivalFullName = arrivalAirportDetails.announcementName || arrivalAirportDetails.name;
+      const displayArrivalShortName = arrivalAirportDetails.shortName || displayArrivalFullName.split(",")[0].split(" ")[0]; 
+      const displayOriginShortName = originAirportDetails.shortName || (originAirportDetails.announcementName || originAirportDetails.name).split(" ")[0];
+
+      let timeAndLandingStatement;
+      const originGmt = originAirportDetails.standardGmtOffset;
+
+      if (originGmt === effectiveArrivalGmt) {
+        timeAndLandingStatement = `There is no time difference between ${displayOriginShortName} and ${displayArrivalShortName}. We expect to land at approximately ${conversationalLocalTime}`;
+      } else {
+        const diff = effectiveArrivalGmt - originGmt;
+        const totalAbsDiffInMinutes = Math.round(Math.abs(diff * 60));
+        const diffHours = Math.floor(totalAbsDiffInMinutes / 60);
+        const diffMinutes = totalAbsDiffInMinutes % 60;
+
+        let diffStr = `${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+        if (diffMinutes > 0) diffStr += ` and ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+        const relation = diff > 0 ? 'ahead of' : 'behind';
+        timeAndLandingStatement = `${displayArrivalShortName} is ${diffStr} ${relation} ${displayOriginShortName}, and we expect to land at approximately ${conversationalLocalTime}`;
+      }
+      
+      const weatherPhrase = weatherPresentation[selectedWeatherPhenomenon] || `is ${selectedWeatherPhenomenon}`;
+      const weatherFull = `${weatherPhrase} with a temperature of ${temperature} degrees Celsius`;
+      
+      const useConversationalTone = document.getElementById('conversationalToneCheck').checked;
+      const speakerIdentifier = speakerRole === "Pilot" ? "your pilot speaking" : `your ${speakerRole}`; 
+      const greeting = useConversationalTone ? "Ladies and Gentlemen, boys and girls," : "Ladies and Gentlemen,";
+
+      const announcement = `${greeting} this is ${speakerIdentifier}. We will be commencing our descent into ${displayArrivalFullName} in about ${todMinutes} minutes time.
+Current Weather at ${displayArrivalShortName} ${weatherFull}.
+${timeAndLandingStatement}, and another ${taxiTimeValue} minutes thereafter to the gate.
+On behalf of the crew, we would like to thank you once again for flying with ${airlineName}. Cabin crew, please prepare for arrival.`; 
+
+      document.getElementById('announcementOutput').value = announcement;
+    }
+    
+    function swapAirports() {
+        const originSelect = document.getElementById('originAirport');
+        const arrivalSelect = document.getElementById('arrivalAirport');
+        const originSearch = document.getElementById('originAirportSearch');
+        const arrivalSearch = document.getElementById('arrivalAirportSearch');
+        const originHomeCheck = document.getElementById('originHomeBaseCheck');
+        const arrivalHomeCheck = document.getElementById('arrivalHomeBaseCheck');
+
+        const tempOriginVal = originSelect.value;
+        const tempArrivalVal = arrivalSelect.value;
+        const tempOriginHome = originHomeCheck.checked;
+        const tempArrivalHome = arrivalHomeCheck.checked;
+
+        originSelect.value = tempArrivalVal;
+        arrivalSelect.value = tempOriginVal;
+
+        originHomeCheck.checked = tempArrivalHome;
+        arrivalHomeCheck.checked = tempOriginHome;
+        
+        originSearch.value = '';
+        arrivalSearch.value = '';
+
+        originSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        arrivalSelect.dispatchEvent(new Event('change', { bubbles: true })); 
+    }
+
+
+    function copyToClipboard() {
+      const outputArea = document.getElementById('announcementOutput');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+          if (outputArea.value) {
+              navigator.clipboard.writeText(outputArea.value).then(() => alert('Announcement copied to clipboard!')).catch(() => alert('Failed to copy.'));
+          } else { alert('Nothing to copy.'); }
+      } else { 
+          if (outputArea.value) { try { outputArea.select(); document.execCommand('copy'); alert('Announcement copied (fallback)!'); } catch (err) { alert('Failed to copy (fallback).'); }
+          } else { alert('Nothing to copy (fallback).'); }
+      }
+    }
+
+    function toggleDarkMode(isNight) {
+        document.body.classList.toggle('night-mode', isNight);
+        localStorage.setItem('darkModePrefArrivalToolV20', isNight ? 'true' : 'false'); // Updated key
+        document.getElementById('darkModeToggle').checked = isNight; 
+    }
+    
+    function validateTimeInput(el, max) { if (el.value) { let v = parseInt(el.value); if (isNaN(v) || v < 0) el.value = ''; else if (v > max) el.value = max; else if (el.value.length > 2 && el.value.startsWith('0')) el.value=el.value.slice(1,3); else if (el.value.length > 2) el.value=el.value.slice(0,2);}}
+    function padTimeInput(el) { if (el.value && el.value.length === 1 && !isNaN(parseInt(el.value))) el.value = "0" + el.value; }
+
+    const savableAnnouncementFields = [
+        'speakerRole', 'originAirport', 'arrivalAirport', 'todMinutes', 
+        'arrivalTimeZuluHH', 'arrivalTimeZuluMM', 
+        'weatherPhenomena', 'temperature', 'taxiTime',
+        'arrivalGmtOffsetManualInput',
+        'originHomeBaseCheck', 'arrivalHomeBaseCheck',
+        'conversationalToneCheck' // Consolidated checkbox
+    ];
+
+    function saveAnnouncementToFile() {
+        const announcementData = {};
+        savableAnnouncementFields.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                if (element.type === 'checkbox') {
+                     announcementData[id] = element.checked;
+                } else if (id === 'arrivalGmtOffsetManualInput' && document.getElementById('arrivalGmtOffsetManualGroup').classList.contains('hidden')) {
+                    announcementData[id] = ""; 
+                } else {
+                    announcementData[id] = element.value;
+                }
+            }
+        });
+        const jsonData = JSON.stringify(announcementData, null, 2);
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const now = new Date();
+        const ddmmyy = `${now.getDate().toString().padStart(2, '0')}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getFullYear().toString().slice(-2)}`;
+        const filename = `${announcementDataFileName.split('.')[0]}_${ddmmyy}.${announcementDataFileName.split('.')[1]}`; 
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+    }
+
+    function loadAnnouncementFromFile(event) {
+        const file = event.target.files[0];
+        if (!file || !file.name.toLowerCase().endsWith('.sqaa')) { if(file) alert("Invalid file type. Please select a '.sqaa' file."); event.target.value = null; return; }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const loadedData = JSON.parse(e.target.result);
+                savableAnnouncementFields.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element && loadedData[id] !== undefined) {
+                        if (element.type === 'checkbox') {
+                            element.checked = loadedData[id];
+                        } else {
+                            element.value = loadedData[id];
+                        }
+                    }
+                });
+                
+                if (loadedData['originHomeBaseCheck']) { document.getElementById('originAirport').value = 'WSSS'; document.getElementById('originAirportSearch').value = ''; }
+                if (loadedData['arrivalHomeBaseCheck']) { document.getElementById('arrivalAirport').value = 'WSSS'; document.getElementById('arrivalAirportSearch').value = ''; }
+
+                if (document.getElementById('originHomeBaseCheck').checked && document.getElementById('arrivalHomeBaseCheck').checked) {
+                     document.getElementById('arrivalHomeBaseCheck').checked = false;
+                }
+
+                handleArrivalAirportChange(); 
+                const arrChangeEvent = new Event('change', { bubbles: true });
+                document.getElementById('arrivalAirport').dispatchEvent(arrChangeEvent);
+                if (loadedData['originHomeBaseCheck']){
+                     document.getElementById('originAirport').dispatchEvent(new Event('change', {bubbles: true}));   
+                }
+
+
+                alert(`Announcement data loaded from ${file.name}`);
+            } catch (error) { console.error(error); alert("Error parsing announcement file."); } 
+            finally { event.target.value = null; }
+        };
+        reader.onerror = function() { alert("Error reading file."); event.target.value = null; };
+        reader.readAsText(file);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      populateAirportDropdowns();
+      populateWeatherDropdown();
+      setupAirportSearch('originAirportSearch', 'originAirport', 'originHomeBaseCheck');
+      setupAirportSearch('arrivalAirportSearch', 'arrivalAirport', 'arrivalHomeBaseCheck');
+      document.getElementById('swapAirportsButton').addEventListener('click', swapAirports);
+      
+      document.getElementById('generateButton').addEventListener('click', generateAnnouncement);
+      document.getElementById('copyButton').addEventListener('click', copyToClipboard);
+      document.getElementById('saveAnnouncementButton').addEventListener('click', saveAnnouncementToFile);
+      document.getElementById('loadAnnouncementButton').addEventListener('click', () => document.getElementById('fileInput').click());
+      document.getElementById('fileInput').addEventListener('change', loadAnnouncementFromFile);
+      
+      ['arrivalTimeZuluHH', 'arrivalTimeZuluMM'].forEach(id => {
+          const el = document.getElementById(id);
+          const max = id === 'arrivalTimeZuluHH' ? 23 : 59;
+          el.addEventListener('input', () => validateTimeInput(el, max));
+          el.addEventListener('blur', () => padTimeInput(el));
+      });
+
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      darkModeToggle.addEventListener('change', () => toggleDarkMode(darkModeToggle.checked));
+      toggleDarkMode(localStorage.getItem('darkModePrefArrivalToolV20') === 'true'); 
+      handleArrivalAirportChange(); 
+    });
+  </script>
+</body>
+</html>
